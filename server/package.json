@@ -11,7 +11,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@hapi/cookie": "^12.0.1",
     "@hapi/hapi": "^20.2.1",
+    "@hapi/iron": "^7.0.1",
     "crdb-pg": "^1.4.1",
     "db-migrate": "^1.0.0-beta.27",
     "db-migrate-cockroachdb": "^5.7.2",

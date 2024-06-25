@@ -1,9 +1,12 @@
 "use strict";
+import 'dotenv/config';
 
 import Hapi from "@hapi/hapi";
 import DBMigrate from "db-migrate";
 import CRDB from "crdb-pg";
 import HapiRouter from "hapi-router-es";
+import HapiCookie from "@hapi/cookie";
+import controllers from "./controllers/user.js";
 
 const dbm = DBMigrate.getInstance(true, { throwUncatched: true });
 
@@ -32,6 +35,21 @@ async function start() {
 
 async function register() {
   try {
+    await server.register(HapiCookie);
+    
+    server.auth.strategy('session', 'cookie', {
+      cookie: {
+        name: "user",
+        password: process.env.STRATEGY_PASSWORD,
+        isHttpOnly: true,
+        path: "/",
+        ttl: 15 * 60 * 1000,
+      },
+      validate: controllers.validateFunc,
+    });
+
+    server.auth.default({strategy: "session"});
+
     await dbm.up();
 
     const dbConfig = dbm.config.getCurrent();
