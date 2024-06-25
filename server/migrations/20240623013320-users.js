@@ -1,95 +1,48 @@
-// "use strict";
-
-// exports.migrate = async (db, opt) => {
-//   const type = opt.dbm.dataType;
-
-//   await db.createTable("users", {
-//     id: {
-//       type: "uuid",
-//       primaryKey: true,
-//       notNull: true,
-//       defaultValue: new String("gen_random_uuid()"),
-//     },
-//     name: {
-//       type: "string",
-//       notNull: true,
-//     },
-//     email: {
-//       type: "string",
-//       notNull: true,
-//     },
-//     password: {
-//       type: "string",
-//       notNull: true,
-//     },
-//     role: {
-//       type: "string",
-//       defaultValue: "user",
-//       notNull: true,
-//       check: "role IN ('admin', 'user', 'tutor')",
-//     },
-//     createdAt: {
-//       type: "timestamp",
-//       notNull: true,
-//       defaultValue: new Date(),
-//     },
-//     updatedAt: {
-//       type: "timestamp",
-//       notNull: true,
-//       defaultValue: new Date(),
-//     },
-//   });
-// };
-
-// exports._meta = {
-//   version: 2,
-// };
-
 "use strict";
-
-exports.up = function (db) {
-  return db.createTable("users", {
+exports.migrate = async (db, opt) => {
+  const type = opt.dbm.dataType;
+  await db.createTable("users", {
     id: {
       type: "uuid",
       primaryKey: true,
-      defaultValue: db.runSql.bind(db, `uuid_generate_v4()`),
+      notNull: true,
+      autoIncrement: true,
+      // defaultValue: { raw: "gen_random_uuid()" }, // Use raw to include the function call correctly
     },
-    username: {
-      type: "string",
+    name: {
+      type: type.STRING,
       notNull: true,
     },
     email: {
-      type: "string",
+      type: type.STRING,
       notNull: true,
-      unique: true,
+      unique: true
     },
     password: {
-      type: "string",
+      type: type.STRING,
       notNull: true,
     },
     role: {
       type: "string",
-      notNull: true,
       defaultValue: "user",
+      notNull: true,
       check: "role IN ('admin', 'user', 'tutor')",
     },
     createdAt: {
-      type: "timestamp",
+      type: "TIMESTAMPTZ",
       notNull: true,
-      defaultValue: new Date(),
+      defaultValue: { raw: "CURRENT_TIMESTAMP()" }, // Use raw to include the current timestamp function
     },
     updatedAt: {
-      type: "timestamp",
+      type: "TIMESTAMPTZ",
       notNull: true,
-      defaultValue: new Date(),
+      defaultValue: { special: "CURRENT_TIMESTAMP" },
+      onUpdate: {
+        special: 'NOW'
+      }
     },
   });
 };
-
-exports.down = function (db) {
-  return db.dropTable("users");
-};
-
 exports._meta = {
-  version: 1,
+  version: 2,
 };

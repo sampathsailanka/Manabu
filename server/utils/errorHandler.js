@@ -1,5 +1,5 @@
-const { StatusCodes, getReasonPhrase } = require("http-status-codes");
-const AppError = require("./AppError");
+import { StatusCodes, getReasonPhrase } from "http-status-codes";
+import AppError from "./AppError.js";
 
 const errorHandler = (error, request, h) => {
   const statusCode = error.isOperational
@@ -21,4 +21,4 @@ const errorHandler = (error, request, h) => {
   return h.response(response).code(statusCode);
 };
 
-module.exports = errorHandler;
+export default errorHandler;

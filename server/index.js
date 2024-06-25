@@ -1,10 +1,21 @@
 "use strict";
 
-const Hapi = require("@hapi/hapi");
-const errorHandler = require("./utils/errorHandler");
-const DBMigrate = require("db-migrate");
+import Hapi from "@hapi/hapi";
+import DBMigrate from "db-migrate";
+import CRDB from "crdb-pg";
+import HapiRouter from "hapi-router-es";
+import errorHandler from "./utils/errorHandler.js";
 
 const dbm = DBMigrate.getInstance(true, { throwUncatched: true });
+
+const _tempPGPlugin = {
+  register: (request, options) => {
+    const crdb = new CRDB(options.config);
+    const pool = crdb.pool();
+    request.expose("pool", pool);
+  },
+  name: "pg",
+};
 
 const server = Hapi.server({
   port: 5000,
@@ -24,29 +35,31 @@ async function register() {
   try {
     await dbm.up();
 
-    const dbConfig = dbm.config.getCurrent().settings;
+    const dbConfig = dbm.config.getCurrent();
 
-    const _tempPGPlugin = {
-      register: (request, options) => {
-        const crdb = new CRDB(options.config);
-        const pool = crdb.pool();
-        request.expose("pool", pool);
+    await server.register([
+      {
+        plugin: _tempPGPlugin,
+        options: { config: dbConfig.settings },
+      }
+    ]);
+
+    await server.register([
+      {
+        plugin: HapiRouter,
+        options: {
+          routes: 'routes/**/*.js'
+        }
       },
-      name: "pg",
-    };
+    ]);
 
-    await server.register({
-      plugin: _tempPGPlugin,
-      options: { config: dbConfig, connectionCount: 8 },
-    });
-
-    //  custom error handling
+    // //  custom error handling
     server.ext("onPreResponse", (req, h) => {
       const response = req.response;
 
       if (response.isBoom) {
         return errorHandler(response, req, h);
-      }
+      };
 
       return h.continue;
     });

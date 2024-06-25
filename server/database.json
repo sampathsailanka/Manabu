@@ -2,10 +2,9 @@
     "dev": {
         "user": "root",
         "host": "localhost",
-        "port": "26257",
-        "database": "users",
-        "driver": "pg",
-        "native": "true",
-        "connectionString": "postgresql://root@localhost:26257/cookiestore?application_name=%24+cockroach+sql&connect_timeout=15&sslmode=disable"
+        "port": 26257,
+        "database": "manabu",
+        "driver": "cockroachdb",
+        "native": true
     }
 }

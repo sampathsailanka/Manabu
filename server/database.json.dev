@@ -1,0 +1,11 @@
+{
+    "dev": {
+        "user": "root",
+        "host": "localhost",
+        "port": "26257",
+        "database": "manabu",
+        "driver": "pg",
+        "native": "true",
+        "connectionString": "postgresql://root@localhost:26257/manabu?application_name=%24+cockroach+sql&connect_timeout=15&sslmode=disable"
+    }
+}
