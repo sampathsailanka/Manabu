@@ -21,7 +21,7 @@ export default (() => [
         path: '/login',
         method: 'POST',
         handler: controller.loginUser,
-        options: {auth: false}
+        config: {auth: false}
     },
     {
         path: '/logout',
