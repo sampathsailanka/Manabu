@@ -4,7 +4,6 @@ import Hapi from "@hapi/hapi";
 import DBMigrate from "db-migrate";
 import CRDB from "crdb-pg";
 import HapiRouter from "hapi-router-es";
-import errorHandler from "./utils/errorHandler.js";
 
 const dbm = DBMigrate.getInstance(true, { throwUncatched: true });
 
@@ -48,21 +47,10 @@ async function register() {
       {
         plugin: HapiRouter,
         options: {
-          routes: 'routes/**/*.js'
+          routes: 'routes/*.js'
         }
       },
     ]);
-
-    // //  custom error handling
-    server.ext("onPreResponse", (req, h) => {
-      const response = req.response;
-
-      if (response.isBoom) {
-        return errorHandler(response, req, h);
-      };
-
-      return h.continue;
-    });
 
     return true;
   } catch (error) {
